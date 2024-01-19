@@ -1,0 +1,11 @@
+.cart_section {
+    background-color: #eee;
+}
+
+.image_cart_background_color {
+    background-color: rgba(251, 251, 251, 0.2)
+}
+
+.cart_button_width {
+    max-width: 300px
+}

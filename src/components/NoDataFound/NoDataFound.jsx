@@ -1,9 +1,9 @@
-const NoDataFound = () => {
+const NoDataFound = ({ message }) => {
 
     return (
         <div className="p-2">
             <div className="alert alert-warning">
-                Sin resultados
+                {message}
             </div>
         </div>
     )

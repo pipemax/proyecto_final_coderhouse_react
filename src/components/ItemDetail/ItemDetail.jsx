@@ -1,13 +1,27 @@
 import ItemCount from '../ItemCount/ItemCount'
 import classes from './ItemDetail.module.css'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { useContext, useEffect, useState } from 'react'
+import { CartContext } from '../../context/CartContext'
 
 const ItemDetail = ({ id, name, img, category, description, price, stock }) => {
 
+    const [quantityAdded, setQuantityAdded] = useState(0);
+
+    const { addItem, getItem } = useContext(CartContext);
+
     const navigate = useNavigate()
 
+    useEffect(() => {
+        const itemInCart = getItem(id)
+        if(itemInCart) {
+            setQuantityAdded(itemInCart.quantity)
+        }
+    }, [])
+
     const onAddCart = (quantity) => {
-        console.log(quantity)
+        setQuantityAdded(quantity)
+        addItem({id, name, price, img}, quantity)
     }
     
     return (
@@ -26,8 +40,25 @@ const ItemDetail = ({ id, name, img, category, description, price, stock }) => {
                         <div>
                             {description}
                         </div>
-                        <ItemCount key={id} initialValue={1} stock={stock} onCallback={onAddCart}/>
-                        <button className='btn btn-info' onClick={() => navigate(`/category/${category}`)}>Volver</button>
+                        <div className="row">
+                            <div className="col-xs-12 col-md-12 col-lg-12">
+                                {
+                                    quantityAdded > 0 ?
+                                        <Link to='/cart' className="btn btn-success m-2">
+                                            Finalizar Compra
+                                        </Link>
+                                    :
+                                    <ItemCount key={id} initialValue={1} stock={stock} onCallback={onAddCart}/>
+                                }
+                            </div>
+                        </div>
+                        <div className="row">
+                            <div className="col-xs-12 col-md-12 col-lg-12">
+                                <button className='btn btn-info' onClick={() => navigate(`/category/${category}`)}>
+                                    Volver
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

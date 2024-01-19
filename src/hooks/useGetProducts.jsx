@@ -1,60 +1,88 @@
 import { useState } from "react"
-import { getAllProducts, getProductsSearch, getProductId, getProductByCategory } from "../asyncMock"
+import { getDocs, collection, getDoc, doc, query, where, and, or } from "firebase/firestore";
+import { db } from "../services/firebase/firebaseConfig";  
 
 export const useGetProducts = () => {
     const [products, setProducts] = useState([])
     const [loadingProducts, setLoadingProducts] = useState(true)
     const [errorProducts, setErrorProducts] = useState(false)
+    const productsDocument = 'products';
 
-    async function getProductsBySearch(query) {
-        getProductsSearch(query)
-        .then(response => {
-            setProducts(response)
-            setLoadingProducts(false)
+    async function getProductsBySearch(term, category) {
+        console.log(term, category)
+        let dynamicQuery = query(collection(db, productsDocument), and(where('name', '>=', term), where('name', '<=', term + '~')));
+        if(category) {
+            dynamicQuery = query(dynamicQuery, where('category', '==', category));
+        }
+        const collectionRef = dynamicQuery;
+        getDocs(collectionRef)
+        .then(querySnapshot => {
+            const productsFormated = querySnapshot.docs.map(document => {
+                const fields = document.data();
+                return { id: document.id, ...fields}
+            });
+            setProducts(productsFormated)
             setErrorProducts(false)
         })
         .catch(error => {
-            setLoadingProducts(false)
             setErrorProducts(error)
+        })
+        .finally(() => {
+            setLoadingProducts(false);
         })
     }
 
     async function getProducts() {
-        getAllProducts()
-        .then(response => {
-            setProducts(response)
-            setLoadingProducts(false)
+        const collectionRef = collection(db, productsDocument);
+        getDocs(collectionRef)
+        .then(querySnapshot => {
+            const productsFormated = querySnapshot.docs.map(document => {
+                const fields = document.data();
+                return { id: document.id, ...fields}
+            });
+            setProducts(productsFormated)
             setErrorProducts(false)
         })
         .catch(error => {
-            setLoadingProducts(false)
             setErrorProducts(error)
+        })
+        .finally(() => {
+            setLoadingProducts(false);
         })
     }
 
     async function getProductById(id) {
-        getProductId(id)
-        .then(response => {
-            setProducts(response)
-            setLoadingProducts(false)
-            setErrorProducts(false)
+        const productRef = doc(db, productsDocument, id);
+        getDoc(productRef)
+        .then(queryDocumentSnapshot => {
+            const fields = queryDocumentSnapshot.data();
+            const productFormated = { id: queryDocumentSnapshot.id, ...fields };
+            setProducts(productFormated);
         })
         .catch(error => {
-            setLoadingProducts(false)
             setErrorProducts(error)
+        })
+        .finally(() => {
+            setLoadingProducts(false);
         })
     }
 
     async function getProductsByCategory(categoryName) {
-        getProductByCategory(categoryName)
-        .then(response => {
-            setProducts(response)
-            setLoadingProducts(false)
+        const collectionRef = query(collection(db, productsDocument), where('category', '==', categoryName));
+        getDocs(collectionRef)
+        .then(querySnapshot => {
+            const productsFormated = querySnapshot.docs.map(document => {
+                const fields = document.data();
+                return { id: document.id, ...fields}
+            });
+            setProducts(productsFormated)
             setErrorProducts(false)
         })
         .catch(error => {
-            setLoadingProducts(false)
             setErrorProducts(error)
+        })
+        .finally(() => {
+            setLoadingProducts(false);
         })
     }
 

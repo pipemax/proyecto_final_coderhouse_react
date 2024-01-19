@@ -2,7 +2,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useItemCount } from "../../hooks/useItemCount";
 import classes from "./ItemCount.module.css"
-import { useEffect, useState } from "react";
 
 const ItemCount = ({ stock, initialValue, onCallback }) => {
     

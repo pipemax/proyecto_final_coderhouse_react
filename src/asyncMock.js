@@ -35,10 +35,16 @@ export const getAllProducts = () => {
     })
 }
 
-export const getProductsSearch = (term) => {
+export const getProductsSearch = (term, category) => {
     return new Promise((resolve) => {
         setTimeout(() => {
-            resolve(products.filter((element) => element.name.match(term)))
+            resolve(products.filter((element) => {
+                let condition = element.name.toUpperCase().match(term.toUpperCase())
+                if(category) {
+                    condition = condition && element.category === category
+                }    
+                return condition                
+            }))
         }, 1500)
     })
 }
